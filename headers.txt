@@ -1,0 +1,15 @@
+Range: 
+ 		bytes 
+		 = 0-,2-2,5-9,-1
+Field:     value            value2        		
+ 			
+  				value3
+Server: gweb++/0.0.1	  
+Connection:close
+Accept:
+ whathever
+Date: 2012/12/06
+ 
+  	
+  		Thursday
+
