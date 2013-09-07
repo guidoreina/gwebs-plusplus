@@ -10,7 +10,7 @@ namespace net {
 	namespace internet {
 		struct scheme {
 			public:
-				static const size_t MAX_LEN = 32;
+				static const size_t kMaxLen = 32;
 
 				static const unsigned char FILE    = 0;
 				static const unsigned char FTP     = 1;

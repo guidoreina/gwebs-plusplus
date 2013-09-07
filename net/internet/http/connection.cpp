@@ -475,7 +475,7 @@ unsigned short net::internet::http::connection::parse_request_line()
 					_M_substate = 5; // ':' after scheme.
 				} else if (scheme::valid_character(c)) {
 					// Scheme too long?
-					if (_M_inp - _M_url > scheme::MAX_LEN) {
+					if (_M_inp - _M_url > scheme::kMaxLen) {
 						return error::BAD_REQUEST;
 					}
 				} else {
