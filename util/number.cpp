@@ -19,7 +19,67 @@ size_t util::number::length(off_t number)
 	return len;
 }
 
-util::number::parse_result util::number::parse(const void* buf, size_t len, unsigned& n, unsigned min, unsigned max)
+util::number::parse_result util::number::parse(const void* buf, size_t len, int32_t& n, int32_t min, int32_t max)
+{
+	if (len == 0) {
+		return PARSE_ERROR;
+	}
+
+	const unsigned char* ptr = (const unsigned char*) buf;
+	const unsigned char* end = ptr + len;
+
+	int32_t sign;
+
+	if (*ptr == '-') {
+		if (len == 1) {
+			return PARSE_ERROR;
+		}
+
+		sign = -1;
+
+		ptr++;
+	} else if (*ptr == '+') {
+		if (len == 1) {
+			return PARSE_ERROR;
+		}
+
+		sign = 1;
+
+		ptr++;
+	} else {
+		sign = 1;
+	}
+
+	n = 0;
+
+	while (ptr < end) {
+		unsigned char c = *ptr++;
+		if (!IS_DIGIT(c)) {
+			return PARSE_ERROR;
+		}
+
+		int32_t tmp = (n * 10) + (c - '0');
+
+		// Overflow?
+		if (tmp < n) {
+			return PARSE_ERROR;
+		}
+
+		n = tmp;
+	}
+
+	n *= sign;
+
+	if (n < min) {
+		return PARSE_UNDERFLOW;
+	} else if (n > max) {
+		return PARSE_OVERFLOW;
+	}
+
+	return PARSE_SUCCEEDED;
+}
+
+util::number::parse_result util::number::parse(const void* buf, size_t len, uint32_t& n, uint32_t min, uint32_t max)
 {
 	if (len == 0) {
 		return PARSE_ERROR;
@@ -36,7 +96,7 @@ util::number::parse_result util::number::parse(const void* buf, size_t len, unsi
 			return PARSE_ERROR;
 		}
 
-		unsigned tmp = (n * 10) + (c - '0');
+		uint32_t tmp = (n * 10) + (c - '0');
 
 		// Overflow?
 		if (tmp < n) {
@@ -55,7 +115,7 @@ util::number::parse_result util::number::parse(const void* buf, size_t len, unsi
 	return PARSE_SUCCEEDED;
 }
 
-util::number::parse_result util::number::parse(const void* buf, size_t len, off_t& n, off_t min, off_t max)
+util::number::parse_result util::number::parse(const void* buf, size_t len, int64_t& n, int64_t min, int64_t max)
 {
 	if (len == 0) {
 		return PARSE_ERROR;
@@ -94,7 +154,7 @@ util::number::parse_result util::number::parse(const void* buf, size_t len, off_
 			return PARSE_ERROR;
 		}
 
-		off_t tmp = (n * 10) + (c - '0');
+		int64_t tmp = (n * 10) + (c - '0');
 
 		// Overflow?
 		if (tmp < n) {
@@ -105,6 +165,42 @@ util::number::parse_result util::number::parse(const void* buf, size_t len, off_
 	}
 
 	n *= sign;
+
+	if (n < min) {
+		return PARSE_UNDERFLOW;
+	} else if (n > max) {
+		return PARSE_OVERFLOW;
+	}
+
+	return PARSE_SUCCEEDED;
+}
+
+util::number::parse_result util::number::parse(const void* buf, size_t len, uint64_t& n, uint64_t min, uint64_t max)
+{
+	if (len == 0) {
+		return PARSE_ERROR;
+	}
+
+	const unsigned char* ptr = (const unsigned char*) buf;
+	const unsigned char* end = ptr + len;
+
+	n = 0;
+
+	while (ptr < end) {
+		unsigned char c = *ptr++;
+		if (!IS_DIGIT(c)) {
+			return PARSE_ERROR;
+		}
+
+		uint64_t tmp = (n * 10) + (c - '0');
+
+		// Overflow?
+		if (tmp < n) {
+			return PARSE_ERROR;
+		}
+
+		n = tmp;
+	}
 
 	if (n < min) {
 		return PARSE_UNDERFLOW;

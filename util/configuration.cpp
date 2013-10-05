@@ -53,7 +53,7 @@ bool util::configuration::load(const char* filename)
 	do {
 		char buf[8 * 1024];
 		ssize_t ret;
-		if ((ret = file.read(buf, MIN(left, sizeof(buf)))) <= 0) {
+		if ((ret = file.read(buf, MIN(left, (off_t) sizeof(buf)))) <= 0) {
 			fprintf(stderr, "[util::configuration::load] Error reading file %s.\n", filename);
 
 			file.close();

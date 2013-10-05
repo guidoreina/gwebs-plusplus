@@ -100,7 +100,7 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 				return false;
 			}
 
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, e->body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.count())) {
 				return false;
 			}
 
@@ -113,7 +113,7 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 			}
 
 			// The 304 response MUST NOT contain a message-body.
-			if (!_M_headers.add(header_name::LAST_MODIFIED, conn._M_last_modified)) {
+			if (!_M_headers.add_time(header_name::LAST_MODIFIED, conn._M_last_modified)) {
 				return false;
 			}
 
@@ -131,7 +131,7 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 				return false;
 			}
 
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, e->body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.count())) {
 				return false;
 			}
 	}

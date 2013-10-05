@@ -270,7 +270,7 @@
 			}
 
 			do {
-				off_t bytes = MIN(READ_BUFFER_SIZE, count - written);
+				off_t bytes = MIN((off_t) READ_BUFFER_SIZE, count - written);
 				if (!_M_output.append((const char*) data + offset, bytes)) {
 					munmap(data, filesize);
 
@@ -329,7 +329,7 @@
 			}
 
 			do {
-				off_t bytes = MIN(READ_BUFFER_SIZE, count - written);
+				off_t bytes = MIN((off_t) READ_BUFFER_SIZE, count - written);
 				if (!_M_output.append((const char*) data + offset, bytes)) {
 					munmap(data, filesize);
 					return -1;

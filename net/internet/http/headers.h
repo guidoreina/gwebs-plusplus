@@ -2,6 +2,7 @@
 #define HEADERS_H
 
 #include <sys/types.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -159,10 +160,13 @@ namespace net {
 
 					// Get header value.
 					const header_value* get_header_value(unsigned char header) const;
-					bool get_header_value(unsigned char header, time_t& t, struct tm& timestamp) const;
-					bool get_header_value(unsigned char header, time_t& t) const;
-					bool get_header_value(unsigned char header, unsigned& n) const;
-					bool get_header_value(unsigned char header, off_t& n) const;
+					bool get_header_time(unsigned char header, time_t& t, struct tm& timestamp) const;
+					bool get_header_time(unsigned char header, time_t& t) const;
+					bool get_header_value(unsigned char header, int32_t& n) const;
+					bool get_header_value(unsigned char header, uint32_t& n) const;
+					bool get_header_value(unsigned char header, int64_t& n) const;
+					bool get_header_value(unsigned char header, uint64_t& n) const;
+
 					const header_value* get_header_value(const char* name, size_t len) const;
 
 					// Get ranges.
@@ -172,9 +176,9 @@ namespace net {
 					bool add(const struct header& h);
 					bool add(const header_name& name, const header_value& value);
 					bool add(const header_name& name, const struct tm& tm);
-					bool add(const header_name& name, time_t t);
-					bool add(const header_name& name, off_t n);
-					bool add(const header_name& name, size_t n);
+					bool add_time(const header_name& name, time_t t);
+					bool add(const header_name& name, int64_t n);
+					bool add(const header_name& name, uint64_t n);
 
 					// Remove header.
 					bool remove(unsigned char header);
@@ -394,7 +398,7 @@ namespace net {
 				return &h->value;
 			}
 
-			inline bool headers::get_header_value(unsigned char header, time_t& t, struct tm& timestamp) const
+			inline bool headers::get_header_time(unsigned char header, time_t& t, struct tm& timestamp) const
 			{
 				const header_value* value;
 				if ((value = get_header_value(header)) == NULL) {
@@ -404,7 +408,7 @@ namespace net {
 				return ((t = date::parse(value->value, value->len, timestamp)) != (time_t) -1);
 			}
 
-			inline bool headers::get_header_value(unsigned char header, time_t& t) const
+			inline bool headers::get_header_time(unsigned char header, time_t& t) const
 			{
 				const header_value* value;
 				if ((value = get_header_value(header)) == NULL) {
@@ -415,7 +419,7 @@ namespace net {
 				return ((t = date::parse(value->value, value->len, timestamp)) != (time_t) -1);
 			}
 
-			inline bool headers::get_header_value(unsigned char header, unsigned& n) const
+			inline bool headers::get_header_value(unsigned char header, int32_t& n) const
 			{
 				const header_value* value;
 				if ((value = get_header_value(header)) == NULL) {
@@ -425,7 +429,27 @@ namespace net {
 				return (util::number::parse(value->value, value->len, n) == util::number::PARSE_SUCCEEDED);
 			}
 
-			inline bool headers::get_header_value(unsigned char header, off_t& n) const
+			inline bool headers::get_header_value(unsigned char header, uint32_t& n) const
+			{
+				const header_value* value;
+				if ((value = get_header_value(header)) == NULL) {
+					return false;
+				}
+
+				return (util::number::parse(value->value, value->len, n) == util::number::PARSE_SUCCEEDED);
+			}
+
+			inline bool headers::get_header_value(unsigned char header, int64_t& n) const
+			{
+				const header_value* value;
+				if ((value = get_header_value(header)) == NULL) {
+					return false;
+				}
+
+				return (util::number::parse(value->value, value->len, n) == util::number::PARSE_SUCCEEDED);
+			}
+
+			inline bool headers::get_header_value(unsigned char header, uint64_t& n) const
 			{
 				const header_value* value;
 				if ((value = get_header_value(header)) == NULL) {
@@ -464,7 +488,7 @@ namespace net {
 				return add(name, value);
 			}
 
-			inline bool headers::add(const header_name& name, time_t t)
+			inline bool headers::add_time(const header_name& name, time_t t)
 			{
 				struct tm tm;
 				gmtime_r(&t, &tm);
@@ -472,7 +496,7 @@ namespace net {
 				return add(name, tm);
 			}
 
-			inline bool headers::add(const header_name& name, off_t n)
+			inline bool headers::add(const header_name& name, int64_t n)
 			{
 				char buf[32];
 
@@ -483,13 +507,13 @@ namespace net {
 				return add(name, value);
 			}
 
-			inline bool headers::add(const header_name& name, size_t n)
+			inline bool headers::add(const header_name& name, uint64_t n)
 			{
 				char buf[32];
 
 				header_value value;
 				value.value = buf;
-				value.len = snprintf(buf, sizeof(buf), "%lu", n);
+				value.len = snprintf(buf, sizeof(buf), "%llu", n);
 
 				return add(name, value);
 			}

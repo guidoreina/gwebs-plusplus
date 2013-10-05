@@ -31,7 +31,7 @@ bool net::internet::http::connection::run()
 
 	do {
 		switch (_M_state) {
-			case STATE_HANDSHAKING:
+			case kHandshaking:
 #if HAVE_SSL
 				if (_M_https) {
 					bool completed;
@@ -45,12 +45,12 @@ bool net::internet::http::connection::run()
 				}
 #endif // HAVE_SSL
 
-				_M_state = STATE_READING_REQUEST_LINE;
+				_M_state = kReadingRequestLine;
 
 				// Fall through.
-			case STATE_READING_REQUEST_LINE:
+			case kReadingRequestLine:
 				// If all the received data has been already processed...
-				if (_M_inp == _M_in.count()) {
+				if (_M_inp == (off_t) _M_in.count()) {
 					if (!_M_readable) {
 						return true;
 					}
@@ -67,19 +67,19 @@ bool net::internet::http::connection::run()
 				}
 
 				if ((ret = parse_request_line()) != 0) {
-					_M_state = STATE_PREPARING_ERROR_PAGE;
+					_M_state = kPreparingErrorPage;
 				} else {
 					if (_M_substate == 26) {
-						_M_state = STATE_AFTER_REQUEST_LINE;
+						_M_state = kAfterRequestLine;
 					}
 				}
 
 				break;
-			case STATE_AFTER_REQUEST_LINE:
+			case kAfterRequestLine:
 				// If all the received data has been already processed...
-				if (_M_inp == _M_in.count()) {
+				if (_M_inp == (off_t) _M_in.count()) {
 					if (!_M_readable) {
-						_M_state = STATE_READING_HEADERS;
+						_M_state = kReadingHeaders;
 						return true;
 					}
 
@@ -90,7 +90,7 @@ bool net::internet::http::connection::run()
 
 					// If nothing has been received...
 					if (count == 0) {
-						_M_state = STATE_READING_HEADERS;
+						_M_state = kReadingHeaders;
 						return true;
 					}
 				}
@@ -98,27 +98,27 @@ bool net::internet::http::connection::run()
 				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.count() - _M_inp)) {
 					case headers::PARSE_NO_MEMORY:
 						ret = error::INTERNAL_SERVER_ERROR;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_INVALID_HEADER:
 						ret = error::BAD_REQUEST;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_HEADERS_TOO_LARGE:
 						ret = error::REQUEST_ENTITY_TOO_LARGE;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_END_OF_HEADER:
 						_M_inp += _M_headers.size();
 
-						_M_state = STATE_PROCESSING_REQUEST;
+						_M_state = kProcessingRequest;
 						break;
 					default:
-						_M_state = STATE_READING_HEADERS;
+						_M_state = kReadingHeaders;
 				}
 
 				break;
-			case STATE_READING_HEADERS:
+			case kReadingHeaders:
 				if (!_M_readable) {
 					return true;
 				}
@@ -136,29 +136,29 @@ bool net::internet::http::connection::run()
 				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.count() - _M_inp)) {
 					case headers::PARSE_NO_MEMORY:
 						ret = error::INTERNAL_SERVER_ERROR;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_INVALID_HEADER:
 						ret = error::BAD_REQUEST;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_HEADERS_TOO_LARGE:
 						ret = error::REQUEST_ENTITY_TOO_LARGE;
-						_M_state = STATE_PREPARING_ERROR_PAGE;
+						_M_state = kPreparingErrorPage;
 						break;
 					case headers::PARSE_END_OF_HEADER:
 						_M_inp += _M_headers.size();
 
-						_M_state = STATE_PROCESSING_REQUEST;
+						_M_state = kProcessingRequest;
 						break;
 					default:
 						;
 				}
 
 				break;
-			case STATE_PROCESSING_REQUEST:
+			case kProcessingRequest:
 				if ((ret = process_request()) != 0) {
-					_M_state = STATE_PREPARING_ERROR_PAGE;
+					_M_state = kPreparingErrorPage;
 				} else {
 					if (!modify(tcp_server::WRITE)) {
 						return false;
@@ -166,7 +166,7 @@ bool net::internet::http::connection::run()
 				}
 
 				break;
-			case STATE_PREPARING_ERROR_PAGE:
+			case kPreparingErrorPage:
 				if (!error::build_page(*this, ret)) {
 					return false;
 				}
@@ -175,10 +175,10 @@ bool net::internet::http::connection::run()
 					return false;
 				}
 
-				_M_state = (_M_method == method::HEAD) ? STATE_SENDING_HEADERS : STATE_SENDING_TWO_BUFFERS;
+				_M_state = (_M_method == method::HEAD) ? kSendingHeaders : kSendingTwoBuffers;
 
 				break;
-			case STATE_SENDING_TWO_BUFFERS:
+			case kSendingTwoBuffers:
 				if (!_M_writable) {
 					return true;
 				}
@@ -191,12 +191,12 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == _M_out.count() + _M_bodyp->count()) {
-					_M_state = STATE_REQUEST_COMPLETED;
+				if (_M_outp == (off_t) (_M_out.count() + _M_bodyp->count())) {
+					_M_state = kRequestCompleted;
 				}
 
 				break;
-			case STATE_SENDING_HEADERS:
+			case kSendingHeaders:
 				if (!_M_writable) {
 					return true;
 				}
@@ -206,11 +206,11 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.count()) {
 					if (_M_method == method::HEAD) {
-						_M_state = STATE_REQUEST_COMPLETED;
+						_M_state = kRequestCompleted;
 					} else if (_M_filesize == 0) {
-						_M_state = STATE_REQUEST_COMPLETED;
+						_M_state = kRequestCompleted;
 					} else {
 						if (_M_ranges.count() == 0) {
 							_M_outp = 0;
@@ -218,12 +218,12 @@ bool net::internet::http::connection::run()
 							_M_outp = _M_ranges.get(0)->from;
 						}
 
-						_M_state = STATE_SENDING_BODY;
+						_M_state = kSendingBody;
 					}
 				}
 
 				break;
-			case STATE_SENDING_BODY:
+			case kSendingBody:
 				if (!_M_writable) {
 					return true;
 				}
@@ -237,7 +237,7 @@ bool net::internet::http::connection::run()
 					if (_M_outp == _M_filesize) {
 						_M_socket.uncork();
 
-						_M_state = STATE_REQUEST_COMPLETED;
+						_M_state = kRequestCompleted;
 					}
 				} else {
 					const util::range* range = _M_ranges.get(_M_nrange);
@@ -250,7 +250,7 @@ bool net::internet::http::connection::run()
 						if (_M_ranges.count() == 1) {
 							_M_socket.uncork();
 
-							_M_state = STATE_REQUEST_COMPLETED;
+							_M_state = kRequestCompleted;
 						} else {
 							_M_out.reset();
 
@@ -260,13 +260,13 @@ bool net::internet::http::connection::run()
 									return false;
 								}
 
-								_M_state = STATE_SENDING_MULTIPART_FOOTER;
+								_M_state = kSendingMultipartFooter;
 							} else {
 								if (!build_part_header()) {
 									return false;
 								}
 
-								_M_state = STATE_SENDING_PART_HEADER;
+								_M_state = kSendingPartHeader;
 							}
 
 							_M_outp = 0;
@@ -275,7 +275,7 @@ bool net::internet::http::connection::run()
 				}
 
 				break;
-			case STATE_SENDING_PART_HEADER:
+			case kSendingPartHeader:
 				if (!_M_writable) {
 					return true;
 				}
@@ -285,13 +285,13 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.count()) {
 					_M_outp = _M_ranges.get(_M_nrange)->from;
-					_M_state = STATE_SENDING_BODY;
+					_M_state = kSendingBody;
 				}
 
 				break;
-			case STATE_SENDING_MULTIPART_FOOTER:
+			case kSendingMultipartFooter:
 				if (!_M_writable) {
 					return true;
 				}
@@ -301,14 +301,14 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.count()) {
 					_M_socket.uncork();
 
-					_M_state = STATE_REQUEST_COMPLETED;
+					_M_state = kRequestCompleted;
 				}
 
 				break;
-			case STATE_REQUEST_COMPLETED:
+			case kRequestCompleted:
 				// Close connection?
 				if (!_M_keep_alive) {
 					return false;
@@ -331,7 +331,7 @@ bool net::internet::http::connection::run()
 
 					_M_inp = 0;
 
-					_M_state = STATE_READING_REQUEST_LINE;
+					_M_state = kReadingRequestLine;
 				}
 
 				break;
@@ -342,7 +342,7 @@ bool net::internet::http::connection::run()
 bool net::internet::http::connection::add_common_headers(headers& h)
 {
 	// Keep-Alive?
-	if (++_M_nrequests == MAX_REQUESTS_PER_CONNECTION) {
+	if (++_M_nrequests == kMaxRequestsPerConnection) {
 		_M_keep_alive = 0;
 	} else {
 		const header_value* v;
@@ -421,7 +421,7 @@ unsigned short net::internet::http::connection::parse_request_line()
 					_M_substate = 3; // Whitespace after method.
 				} else if ((c >= 'A') && (c <= 'Z')) {
 					// Method too long?
-					if (_M_inp - _M_token > method::METHOD_MAX_LEN) {
+					if (_M_inp - _M_token > (off_t) method::METHOD_MAX_LEN) {
 						_M_method = method::UNKNOWN;
 						return error::BAD_REQUEST;
 					}
@@ -475,7 +475,7 @@ unsigned short net::internet::http::connection::parse_request_line()
 					_M_substate = 5; // ':' after scheme.
 				} else if (scheme::valid_character(c)) {
 					// Scheme too long?
-					if (_M_inp - _M_url > scheme::kMaxLen) {
+					if (_M_inp - _M_url > (off_t) scheme::kMaxLen) {
 						return error::BAD_REQUEST;
 					}
 				} else {
@@ -991,7 +991,7 @@ unsigned short net::internet::http::connection::parse_request_line()
 				return 0;
 		}
 
-		if (++_M_inp > REQUEST_LINE_MAX_LEN) {
+		if (++_M_inp > (off_t) kRequestLineMaxLen) {
 			return error::REQUEST_ENTITY_TOO_LARGE;
 		}
 	}
@@ -1485,7 +1485,7 @@ unsigned short net::internet::http::connection::process_request()
 			}
 
 			// Add Content-Length header.
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, _M_body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) _M_body.count())) {
 				return error::INTERNAL_SERVER_ERROR;
 			}
 
@@ -1501,7 +1501,7 @@ unsigned short net::internet::http::connection::process_request()
 
 			_M_bodyp = &_M_body;
 
-			_M_state = (_M_method == method::HEAD) ? STATE_SENDING_HEADERS : STATE_SENDING_TWO_BUFFERS;
+			_M_state = (_M_method == method::HEAD) ? kSendingHeaders : kSendingTwoBuffers;
 
 			return 0;
 		}
@@ -1520,7 +1520,7 @@ unsigned short net::internet::http::connection::process_request()
 
 	// If the If-Modified-Since header is present...
 	time_t t;
-	if (_M_headers.get_header_value(header_name::IF_MODIFIED_SINCE, t)) {
+	if (_M_headers.get_header_time(header_name::IF_MODIFIED_SINCE, t)) {
 		_M_last_modified = buf.st_mtime;
 
 		if (t == _M_last_modified) {
@@ -1528,24 +1528,18 @@ unsigned short net::internet::http::connection::process_request()
 		}
 	}
 
-	unsigned status_code;
-
 	if (!_M_headers.get_ranges(_M_filesize, _M_ranges)) {
 		_M_ranges.reset();
 
 		if (!_M_out.append("HTTP/1.1 200 OK\r\n", 17)) {
 			return error::INTERNAL_SERVER_ERROR;
 		}
-
-		status_code = 200;
 	} else if (_M_ranges.count() == 0) {
 		return error::REQUESTED_RANGE_NOT_SATISFIABLE;
 	} else {
 		if (!_M_out.append("HTTP/1.1 206 Partial Content\r\n", 30)) {
 			return error::INTERNAL_SERVER_ERROR;
 		}
-
-		status_code = 206;
 	}
 
 	if (!add_common_headers(_M_headers)) {
@@ -1585,7 +1579,7 @@ unsigned short net::internet::http::connection::process_request()
 		return error::INTERNAL_SERVER_ERROR;
 	}
 
-	if (!_M_headers.add(header_name::LAST_MODIFIED, buf.st_mtime)) {
+	if (!_M_headers.add_time(header_name::LAST_MODIFIED, buf.st_mtime)) {
 		return error::INTERNAL_SERVER_ERROR;
 	}
 
@@ -1628,7 +1622,7 @@ unsigned short net::internet::http::connection::process_request()
 		_M_socket.cork();
 	}
 
-	_M_state = STATE_SENDING_HEADERS;
+	_M_state = kSendingHeaders;
 
 	return 0;
 }

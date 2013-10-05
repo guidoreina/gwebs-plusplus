@@ -1,5 +1,5 @@
-#ifndef HTTP_CONNECTION_H
-#define HTTP_CONNECTION_H
+#ifndef NET_INTERNET_HTTP_CONNECTION_H
+#define NET_INTERNET_HTTP_CONNECTION_H
 
 #include <sys/types.h>
 #include "fs/file.h"
@@ -15,23 +15,23 @@ namespace net {
 		namespace http {
 			struct connection : public tcp_connection {
 				public:
-					static const unsigned MAX_REQUESTS_PER_CONNECTION = 10;
+					static const unsigned kMaxRequestsPerConnection = 10;
 
-					static const size_t REQUEST_LINE_MAX_LEN = 32 * 1024;
+					static const size_t kRequestLineMaxLen = 32 * 1024;
 
 					// HTTP states.
-					static const unsigned char STATE_HANDSHAKING = 0;
-					static const unsigned char STATE_READING_REQUEST_LINE = 1;
-					static const unsigned char STATE_AFTER_REQUEST_LINE = 2;
-					static const unsigned char STATE_READING_HEADERS = 3;
-					static const unsigned char STATE_PROCESSING_REQUEST = 4;
-					static const unsigned char STATE_PREPARING_ERROR_PAGE = 5;
-					static const unsigned char STATE_SENDING_TWO_BUFFERS = 6;
-					static const unsigned char STATE_SENDING_HEADERS = 7;
-					static const unsigned char STATE_SENDING_BODY = 8;
-					static const unsigned char STATE_SENDING_PART_HEADER = 9;
-					static const unsigned char STATE_SENDING_MULTIPART_FOOTER = 10;
-					static const unsigned char STATE_REQUEST_COMPLETED = 11;
+					static const unsigned char kHandshaking = 0;
+					static const unsigned char kReadingRequestLine = 1;
+					static const unsigned char kAfterRequestLine = 2;
+					static const unsigned char kReadingHeaders = 3;
+					static const unsigned char kProcessingRequest = 4;
+					static const unsigned char kPreparingErrorPage = 5;
+					static const unsigned char kSendingTwoBuffers = 6;
+					static const unsigned char kSendingHeaders = 7;
+					static const unsigned char kSendingBody = 8;
+					static const unsigned char kSendingPartHeader = 9;
+					static const unsigned char kSendingMultipartFooter = 10;
+					static const unsigned char kRequestCompleted = 11;
 
 					// HTTP versions.
 					static const unsigned char HTTP_0_9 = 0;
@@ -243,4 +243,4 @@ namespace net {
 	}
 }
 
-#endif // HTTP_CONNECTION_H
+#endif // NET_INTERNET_HTTP_CONNECTION_H

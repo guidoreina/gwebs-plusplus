@@ -186,6 +186,9 @@ bool fs::directory::search(size_t* entries, size_t count, const char* name, unsi
 			case SORT_BY_TIME:
 				ret = mtime - _M_entries[entries[pivot]].mtime;
 				break;
+			default:
+				pos = 0;
+				return false;
 		}
 
 		if ((ret *= _M_order) < 0) {

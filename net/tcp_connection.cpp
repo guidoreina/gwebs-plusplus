@@ -115,7 +115,7 @@ bool net::tcp_connection::unsecure_writev(const string::buffer** bufs, unsigned 
 	}
 
 	off_t outp = _M_outp;
-	while ((count > 0) && (outp >= (*bufs)->count())) {
+	while ((count > 0) && (outp >= (off_t) (*bufs)->count())) {
 		outp -= (*bufs)->count();
 
 		bufs++;
@@ -345,7 +345,7 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 		}
 
 		off_t outp = _M_outp;
-		while ((count > 0) && (outp >= (*bufs)->count())) {
+		while ((count > 0) && (outp >= (off_t) (*bufs)->count())) {
 			outp -= (*bufs)->count();
 
 			bufs++;
