@@ -59,7 +59,6 @@ bool string::buffer::vformat(const char* format, va_list ap)
 
 			if (n < size) {
 				_M_used += n;
-
 				break;
 			}
 
