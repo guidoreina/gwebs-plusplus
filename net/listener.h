@@ -20,6 +20,9 @@ namespace net {
 
 		static tcp_server* _M_server;
 
+		// Destructor.
+		virtual ~listener();
+
 		// Create listener.
 		bool create(const socket_address& addr);
 
@@ -35,6 +38,10 @@ namespace net {
 		// Get port.
 		in_port_t port() const;
 	};
+
+	inline listener::~listener()
+	{
+	}
 
 	inline bool listener::create(const socket_address& addr)
 	{

@@ -84,7 +84,7 @@ bool net::socket::listen(const socket_address& addr)
 	}
 
 	// Bind.
-	if (bind(_M_fd, reinterpret_cast<const struct sockaddr*>(&addr), sizeof(socket_address)) < 0) {
+	if (bind(_M_fd, reinterpret_cast<const struct sockaddr*>(&addr), addr.size()) < 0) {
 		if (addr.ss_family == AF_UNIX) {
 			unlink(reinterpret_cast<const local_address*>(&addr)->sun_path);
 		}
