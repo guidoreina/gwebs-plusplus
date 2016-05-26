@@ -61,7 +61,7 @@ bool net::internet::mime::types::load(const char* filename)
 					if (c > ' ') {
 						extensionlen++;
 					} else {
-						off = _M_buf.count();
+						off = _M_buf.length();
 
 						if (!_M_buf.append(type, typelen)) {
 							fclose(file);
@@ -106,7 +106,7 @@ bool net::internet::mime::types::load(const char* filename)
 
 		switch (state) {
 			case 3:
-				off = _M_buf.count();
+				off = _M_buf.length();
 
 				if (!_M_buf.append(type, typelen)) {
 					fclose(file);
@@ -142,7 +142,7 @@ bool net::internet::mime::types::add(size_t type, unsigned short typelen, const 
 		return true;
 	}
 
-	size_t off = _M_buf.count();
+	size_t off = _M_buf.length();
 
 	if (!_M_buf.append(extension, extensionlen)) {
 		return false;

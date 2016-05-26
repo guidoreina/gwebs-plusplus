@@ -287,7 +287,7 @@ namespace util {
 		}
 	}
 
-	inline configuration::configuration(bool ordered) : _M_buf(4 * 1024)
+	inline configuration::configuration(bool ordered)
 	{
 		_M_keys.keys = NULL;
 		_M_keys.size = 0;

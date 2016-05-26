@@ -50,7 +50,7 @@ bool net::internet::http::connection::run()
 				// Fall through.
 			case kReadingRequestLine:
 				// If all the received data has been already processed...
-				if (_M_inp == (off_t) _M_in.count()) {
+				if (_M_inp == (off_t) _M_in.length()) {
 					if (!_M_readable) {
 						return true;
 					}
@@ -77,7 +77,7 @@ bool net::internet::http::connection::run()
 				break;
 			case kAfterRequestLine:
 				// If all the received data has been already processed...
-				if (_M_inp == (off_t) _M_in.count()) {
+				if (_M_inp == (off_t) _M_in.length()) {
 					if (!_M_readable) {
 						_M_state = kReadingHeaders;
 						return true;
@@ -95,7 +95,7 @@ bool net::internet::http::connection::run()
 					}
 				}
 
-				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.count() - _M_inp)) {
+				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.length() - _M_inp)) {
 					case headers::PARSE_NO_MEMORY:
 						ret = error::INTERNAL_SERVER_ERROR;
 						_M_state = kPreparingErrorPage;
@@ -133,7 +133,7 @@ bool net::internet::http::connection::run()
 					return true;
 				}
 
-				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.count() - _M_inp)) {
+				switch (_M_headers.parse(_M_in.data() + _M_inp, _M_in.length() - _M_inp)) {
 					case headers::PARSE_NO_MEMORY:
 						ret = error::INTERNAL_SERVER_ERROR;
 						_M_state = kPreparingErrorPage;
@@ -191,7 +191,7 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == (off_t) (_M_out.count() + _M_bodyp->count())) {
+				if (_M_outp == (off_t) (_M_out.length() + _M_bodyp->length())) {
 					_M_state = kRequestCompleted;
 				}
 
@@ -206,7 +206,7 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == (off_t) _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.length()) {
 					if (_M_method == method::HEAD) {
 						_M_state = kRequestCompleted;
 					} else if (_M_filesize == 0) {
@@ -252,7 +252,7 @@ bool net::internet::http::connection::run()
 
 							_M_state = kRequestCompleted;
 						} else {
-							_M_out.reset();
+							_M_out.clear();
 
 							// Last part?
 							if (++_M_nrange == _M_ranges.count()) {
@@ -285,7 +285,7 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == (off_t) _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.length()) {
 					_M_outp = _M_ranges.get(_M_nrange)->from;
 					_M_state = kSendingBody;
 				}
@@ -301,7 +301,7 @@ bool net::internet::http::connection::run()
 				}
 
 				// If everything has been sent...
-				if (_M_outp == (off_t) _M_out.count()) {
+				if (_M_outp == (off_t) _M_out.length()) {
 					_M_socket.uncork();
 
 					_M_state = kRequestCompleted;
@@ -321,12 +321,12 @@ bool net::internet::http::connection::run()
 
 					// If there is more data in the input buffer.
 					size_t left;
-					if ((left = _M_in.count() - _M_inp) > 0) {
+					if ((left = _M_in.length() - _M_inp) > 0) {
 						char* data = _M_in.data();
 						memmove(data, data + _M_inp, left);
-						_M_in.count(left);
+						_M_in.length(left);
 					} else {
-						_M_in.reset();
+						_M_in.clear();
 					}
 
 					_M_inp = 0;
@@ -385,7 +385,7 @@ bool net::internet::http::connection::add_common_headers(headers& h)
 unsigned short net::internet::http::connection::parse_request_line()
 {
 	const char* data = _M_in.data();
-	const char* end = data + _M_in.count();
+	const char* end = _M_in.end();
 
 	for (const char* d = data + _M_inp; d < end; d++) {
 		unsigned char c = (unsigned char) *d;
@@ -1320,15 +1320,15 @@ unsigned short net::internet::http::connection::parse_path()
 			// Empty path.
 			break;
 		case 3: // Segment.
-			_M_path.count(dest - _M_path.data());
+			_M_path.length(dest - _M_path.data());
 			break;
 		case 4: // '/'
 			*dest++ = '/';
-			_M_path.count(dest - _M_path.data());
+			_M_path.length(dest - _M_path.data());
 			break;
 		case 5: // "/."
 			*dest++ = '/';
-			_M_path.count(dest - _M_path.data());
+			_M_path.length(dest - _M_path.data());
 			break;
 		case 6: // "/.."
 			if (dest == _M_path.data()) {
@@ -1342,7 +1342,7 @@ unsigned short net::internet::http::connection::parse_path()
 				}
 			}
 
-			_M_path.count(dest - _M_path.data());
+			_M_path.length(dest - _M_path.data());
 
 			break;
 	}
@@ -1415,7 +1415,7 @@ unsigned short net::internet::http::connection::process_request()
 
 	// Check that the path is not too long.
 	size_t rootlen = _M_vhost->rootlen();
-	if (rootlen + ((_M_path.count() == 0) ? 1 : _M_path.count()) > PATH_MAX) {
+	if (rootlen + ((_M_path.empty()) ? 1 : _M_path.length()) > PATH_MAX) {
 		return error::REQUEST_URI_TOO_LONG;
 	}
 
@@ -1424,11 +1424,11 @@ unsigned short net::internet::http::connection::process_request()
 	memcpy(path, _M_vhost->root(), rootlen);
 	size_t pathlen = rootlen;
 
-	if (_M_path.count() == 0) {
+	if (_M_path.empty()) {
 		path[pathlen++] = '/';
 	} else {
-		memcpy(path + pathlen, _M_path.data(), _M_path.count());
-		pathlen += _M_path.count();
+		memcpy(path + pathlen, _M_path.data(), _M_path.length());
+		pathlen += _M_path.length();
 	}
 
 	path[pathlen] = 0;
@@ -1485,7 +1485,7 @@ unsigned short net::internet::http::connection::process_request()
 			}
 
 			// Add Content-Length header.
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) _M_body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) _M_body.length())) {
 				return error::INTERNAL_SERVER_ERROR;
 			}
 
@@ -1562,7 +1562,7 @@ unsigned short net::internet::http::connection::process_request()
 	// Add MIME type.
 	if (!index) {
 		unsigned short extlen;
-		if ((_M_extension == 0) || ((extlen = _M_path.count() - _M_extension) == 0)) {
+		if ((_M_extension == 0) || ((extlen = _M_path.length() - _M_extension) == 0)) {
 			_M_mime_type = mime::types::DEFAULT_MIME_TYPE;
 			_M_mime_type_len = mime::types::DEFAULT_MIME_TYPE_LEN;
 		} else {

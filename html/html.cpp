@@ -9,7 +9,7 @@ bool html::encode(const char* string, size_t len, size_t max_utf8len, string::bu
 
 	const char* end = string + len;
 
-	char* d = buf.data() + buf.count();
+	char* d = buf.end();
 	char* dest = d;
 
 	size_t utf8len = 0;
@@ -100,7 +100,7 @@ bool html::encode(const char* string, size_t len, size_t max_utf8len, string::bu
 
 	count = dest - d;
 
-	buf.increment_count(count);
+	buf.increment_length(count);
 
 	return true;
 }

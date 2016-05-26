@@ -9,7 +9,7 @@
 unsigned net::tcp_connection::_M_max_idle_time = MAX_IDLE_TIME;
 net::tcp_server* net::tcp_connection::_M_server = NULL;
 
-net::tcp_connection::tcp_connection() : _M_in(READ_BUFFER_SIZE)
+net::tcp_connection::tcp_connection()
 {
 	_M_inp = 0;
 	_M_outp = 0;
@@ -24,7 +24,7 @@ net::tcp_connection::tcp_connection() : _M_in(READ_BUFFER_SIZE)
 
 void net::tcp_connection::reset()
 {
-	_M_out.reset();
+	_M_out.clear();
 	_M_outp = 0;
 
 	_M_state = 0;
@@ -43,7 +43,7 @@ bool net::tcp_connection::unsecure_read(string::buffer& buf, size_t& count)
 
 	// Receive.
 	ssize_t ret;
-	if ((ret = _M_socket.read(buf.data() + buf.count(), READ_BUFFER_SIZE, 0)) < 0) {
+	if ((ret = _M_socket.read(buf.end(), READ_BUFFER_SIZE, 0)) < 0) {
 		if (errno == EAGAIN) {
 			if (!add_timer()) {
 				return false;
@@ -58,7 +58,7 @@ bool net::tcp_connection::unsecure_read(string::buffer& buf, size_t& count)
 		// The peer has performed an orderly shutdown.
 		return false;
 	} else {
-		buf.increment_count(ret);
+		buf.increment_length(ret);
 		count = ret;
 
 		if ((size_t) ret < count) {
@@ -78,7 +78,7 @@ bool net::tcp_connection::unsecure_read(string::buffer& buf, size_t& count)
 bool net::tcp_connection::unsecure_write(const string::buffer& buf)
 {
 	// Send.
-	size_t count = buf.count() - _M_outp;
+	size_t count = buf.length() - _M_outp;
 	ssize_t ret;
 	if ((ret = _M_socket.write(buf.data() + _M_outp, count, 0)) < 0) {
 		if (errno == EAGAIN) {
@@ -115,8 +115,8 @@ bool net::tcp_connection::unsecure_writev(const string::buffer** bufs, unsigned 
 	}
 
 	off_t outp = _M_outp;
-	while ((count > 0) && (outp >= (off_t) (*bufs)->count())) {
-		outp -= (*bufs)->count();
+	while ((count > 0) && (outp >= (off_t) (*bufs)->length())) {
+		outp -= (*bufs)->length();
 
 		bufs++;
 		count--;
@@ -127,7 +127,7 @@ bool net::tcp_connection::unsecure_writev(const string::buffer** bufs, unsigned 
 
 	for (unsigned i = 0; i < count; i++) {
 		vec[i].iov_base = (char*) (*bufs)->data() + outp;
-		vec[i].iov_len = (*bufs)->count() - outp;
+		vec[i].iov_len = (*bufs)->length() - outp;
 
 		total += vec[i].iov_len;
 
@@ -253,7 +253,7 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 		bool want_read;
 		bool want_write;
 		ssize_t ret;
-		if ((ret = _M_ssl_socket.read(buf.data() + buf.count(), READ_BUFFER_SIZE, want_read, want_write)) < 0) {
+		if ((ret = _M_ssl_socket.read(buf.end(), READ_BUFFER_SIZE, want_read, want_write)) < 0) {
 			if (want_read) {
 				if (!add_timer()) {
 					return false;
@@ -278,7 +278,7 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 				return false;
 			}
 		} else {
-			buf.increment_count(ret);
+			buf.increment_length(ret);
 			count = ret;
 
 			if (want_read) {
@@ -308,7 +308,7 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 		// Send.
 		bool want_read;
 		bool want_write;
-		size_t count = buf.count() - _M_outp;
+		size_t count = buf.length() - _M_outp;
 		ssize_t ret;
 		if ((ret = _M_ssl_socket.write(buf.data() + _M_outp, count, want_read, want_write)) < 0) {
 			if (want_read) {
@@ -345,8 +345,8 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 		}
 
 		off_t outp = _M_outp;
-		while ((count > 0) && (outp >= (off_t) (*bufs)->count())) {
-			outp -= (*bufs)->count();
+		while ((count > 0) && (outp >= (off_t) (*bufs)->length())) {
+			outp -= (*bufs)->length();
 
 			bufs++;
 			count--;
@@ -356,7 +356,7 @@ bool net::tcp_connection::unsecure_sendfile(fs::file& f, off_t filesize, const u
 
 		for (unsigned i = 0; i < count; i++) {
 			vec[i].iov_base = (char*) (*bufs)->data() + outp;
-			vec[i].iov_len = (*bufs)->count() - outp;
+			vec[i].iov_len = (*bufs)->length() - outp;
 
 			outp = 0;
 

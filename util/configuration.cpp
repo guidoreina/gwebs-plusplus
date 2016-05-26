@@ -709,28 +709,28 @@ bool util::configuration::add_key(key_type type)
 
 	k->_M_type = type;
 
-	k->_M_name.off = _M_buf.count();
+	k->_M_name.off = _M_buf.length();
 	k->_M_name.len = _M_state._M_keylen;
 
-	char* data = _M_buf.data() + _M_buf.count();
+	char* data = _M_buf.end();
 
 	memcpy(data, _M_state._M_key, _M_state._M_keylen);
 	data += _M_state._M_keylen;
 	*data++ = 0;
 
-	_M_buf.increment_count(_M_state._M_keylen + 1);
+	_M_buf.increment_length(_M_state._M_keylen + 1);
 
 	if (type == KEY_HAS_VALUE) {
-		k->_M_value.off = _M_buf.count();
+		k->_M_value.off = _M_buf.length();
 		k->_M_value.len = _M_state._M_valuelen;
 
-		char* data = _M_buf.data() + _M_buf.count();
+		char* data = _M_buf.end();
 
 		memcpy(data, _M_state._M_value, _M_state._M_valuelen);
 		data += _M_state._M_valuelen;
 		*data = 0;
 
-		_M_buf.increment_count(_M_state._M_valuelen + 1);
+		_M_buf.increment_length(_M_state._M_valuelen + 1);
 	} else {
 		k->_M_children = NULL;
 	}

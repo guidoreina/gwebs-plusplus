@@ -79,15 +79,15 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 
 				if (!https) {
 					if (port == HTTP_DEFAULT_PORT) {
-						value.len = snprintf(buffer, sizeof(buffer), "http://%.*s%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), conn._M_path.count(), conn._M_path.data());
+						value.len = snprintf(buffer, sizeof(buffer), "http://%.*s%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), conn._M_path.length(), conn._M_path.data());
 					} else {
-						value.len = snprintf(buffer, sizeof(buffer), "http://%.*s:%u%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), port, conn._M_path.count(), conn._M_path.data());
+						value.len = snprintf(buffer, sizeof(buffer), "http://%.*s:%u%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), port, conn._M_path.length(), conn._M_path.data());
 					}
 				} else {
 					if (port == HTTPS_DEFAULT_PORT) {
-						value.len = snprintf(buffer, sizeof(buffer), "https://%.*s%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), conn._M_path.count(), conn._M_path.data());
+						value.len = snprintf(buffer, sizeof(buffer), "https://%.*s%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), conn._M_path.length(), conn._M_path.data());
 					} else {
-						value.len = snprintf(buffer, sizeof(buffer), "https://%.*s:%u%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), port, conn._M_path.count(), conn._M_path.data());
+						value.len = snprintf(buffer, sizeof(buffer), "https://%.*s:%u%.*s/", conn._M_vhost->namelen(), conn._M_vhost->name(), port, conn._M_path.length(), conn._M_path.data());
 					}
 				}
 			}
@@ -100,7 +100,7 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 				return false;
 			}
 
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.length())) {
 				return false;
 			}
 
@@ -131,7 +131,7 @@ bool net::internet::http::error::build_page(connection& conn, unsigned short sta
 				return false;
 			}
 
-			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.count())) {
+			if (!_M_headers.add(header_name::CONTENT_LENGTH, (uint64_t) e->body.length())) {
 				return false;
 			}
 	}

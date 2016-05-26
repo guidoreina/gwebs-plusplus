@@ -245,16 +245,16 @@
 			off_t written = 0;
 
 			// If there is still data in the buffer...
-			if (_M_output.count() > 0) {
+			if (!_M_output.empty()) {
 				ssize_t ret;
-				if ((ret = s.write(_M_output.data(), _M_output.count(), want_read, want_write)) < 0) {
+				if ((ret = s.write(_M_output.data(), _M_output.length(), want_read, want_write)) < 0) {
 					return -1;
 				}
 
 				offset += ret;
 				written = ret;
 
-				_M_output.reset();
+				_M_output.clear();
 
 				if (written == count) {
 					return count;
@@ -293,7 +293,7 @@
 					offset += ret;
 					written += ret;
 
-					_M_output.reset();
+					_M_output.clear();
 				}
 			} while (written < count);
 
@@ -307,16 +307,16 @@
 			off_t written = 0;
 
 			// If there is still data in the buffer...
-			if (_M_output.count() > 0) {
+			if (!_M_output.empty()) {
 				ssize_t ret;
-				if ((ret = s.write(_M_output.data(), _M_output.count(), timeout)) < 0) {
+				if ((ret = s.write(_M_output.data(), _M_output.length(), timeout)) < 0) {
 					return -1;
 				}
 
 				offset += ret;
 				written = ret;
 
-				_M_output.reset();
+				_M_output.clear();
 
 				if (written == count) {
 					return count;
@@ -343,7 +343,7 @@
 					offset += ret;
 					written += ret;
 
-					_M_output.reset();
+					_M_output.clear();
 				}
 			} while (written < count);
 
@@ -357,16 +357,16 @@
 			off_t written = 0;
 
 			// If there is still data in the buffer...
-			if (_M_output.count() > 0) {
+			if (!_M_output.empty()) {
 				ssize_t ret;
-				if ((ret = s.write(_M_output.data(), _M_output.count(), want_read, want_write)) < 0) {
+				if ((ret = s.write(_M_output.data(), _M_output.length(), want_read, want_write)) < 0) {
 					return -1;
 				}
 
 				offset += ret;
 				written = ret;
 
-				_M_output.reset();
+				_M_output.clear();
 
 				if (written == count) {
 					return count;
@@ -407,7 +407,7 @@
 					if ((!want_read) && (!want_write)) {
 						return -1;
 					} else {
-						_M_output.count(bytes);
+						_M_output.length(bytes);
 
 						return (written == 0) ? -1 : written;
 					}
@@ -428,16 +428,16 @@
 			off_t written = 0;
 
 			// If there is still data in the buffer...
-			if (_M_output.count() > 0) {
+			if (!_M_output.empty()) {
 				ssize_t ret;
-				if ((ret = s.write(_M_output.data(), _M_output.count(), timeout)) < 0) {
+				if ((ret = s.write(_M_output.data(), _M_output.length(), timeout)) < 0) {
 					return -1;
 				}
 
 				offset += ret;
 				written = ret;
 
-				_M_output.reset();
+				_M_output.clear();
 
 				if (written == count) {
 					return count;

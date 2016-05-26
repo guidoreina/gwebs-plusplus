@@ -1,199 +1,256 @@
-#ifndef BUFFER_H
-#define BUFFER_H
+#ifndef STRING_BUFFER_H
+#define STRING_BUFFER_H
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 
 namespace string {
-	class buffer {
-		public:
-			static const size_t DEFAULT_INITIAL_SIZE = 64;
+  class buffer {
+    public:
+      // Constructor.
+      buffer();
+      buffer(buffer&& other);
 
-			// Constructor.
-			buffer(size_t initial_size = DEFAULT_INITIAL_SIZE);
+      // Destructor.
+      ~buffer();
 
-			// Destructor.
-			virtual ~buffer();
+      // Move assignment operator.
+      buffer& operator=(buffer&& other);
 
-			// Free buffer.
-			void free();
+      // Swap content.
+      void swap(buffer& other);
 
-			// Reset buffer.
-			void reset();
+      // Free buffer.
+      void free();
 
-			// Get data.
-			const char* data() const;
+      // Clear buffer.
+      void clear();
 
-			char* data();
+      // Get data.
+      const char* data() const;
+      char* data();
 
-			// Get size.
-			size_t size() const;
+      // Get end.
+      char* end();
 
-			// Get count.
-			size_t count() const;
+      // Get size of allocated storage.
+      size_t capacity() const;
 
-			// Set count.
-			void count(size_t value);
+      // Empty?
+      bool empty() const;
 
-			// Increment count.
-			void increment_count(size_t inc);
+      // Get length.
+      size_t length() const;
 
-			// Set initial size.
-			void set_initial_size(size_t initial_size);
+      // Set length.
+      void length(size_t value);
 
-			// Allocate memory.
-			bool allocate(size_t size);
+      // Increment length.
+      void increment_length(size_t inc);
 
-			// Append.
-			bool append(char c);
-			bool append(const char* string);
-			bool append(const char* string, size_t len);
+      // Get remaining space available.
+      size_t remaining() const;
 
-			// Append NUL-terminated string.
-			bool append_nul_terminated_string(const char* string, size_t len);
+      // Allocate memory.
+      bool allocate(size_t size);
 
-			// Format string.
-			bool format(const char* format, ...);
-			bool vformat(const char* format, va_list ap);
+      // Append.
+      bool append(char c);
+      bool append(const char* string);
+      bool append(const char* string, size_t len);
 
-		protected:
-			char* _M_data;
-			size_t _M_size;
-			size_t _M_used;
+      // Append NUL-terminated string.
+      bool append_nul_terminated_string(const char* string, size_t len);
 
-			size_t _M_initial_size;
-	};
+      // Format string.
+      bool format(const char* format, ...);
+      bool vformat(const char* format, va_list ap);
 
-	inline buffer::buffer(size_t initial_size)
-	{
-		_M_data = NULL;
-		_M_size = 0;
-		_M_used = 0;
+    private:
+      static const size_t kInitialSize = 64;
 
-		set_initial_size(initial_size);
-	}
+      char* _M_data;
+      size_t _M_size;
+      size_t _M_used;
 
-	inline buffer::~buffer()
-	{
-		free();
-	}
+      // Disable copy constructor and assignment operator.
+      buffer(const buffer&) = delete;
+      buffer& operator=(const buffer&) = delete;
+  };
 
-	inline void buffer::free()
-	{
-		if (_M_data) {
-			::free(_M_data);
-			_M_data = NULL;
-		}
+  inline buffer::buffer()
+    : _M_data(NULL),
+      _M_size(0),
+      _M_used(0)
+  {
+  }
 
-		_M_size = 0;
-		_M_used = 0;
-	}
+  inline buffer::buffer(buffer&& other)
+    : _M_data(other._M_data),
+      _M_size(other._M_size),
+      _M_used(other._M_used)
+  {
+    other._M_data = NULL;
+    other._M_size = 0;
+    other._M_used = 0;
+  }
 
-	inline void buffer::reset()
-	{
-		_M_used = 0;
-	}
+  inline buffer::~buffer()
+  {
+    free();
+  }
 
-	inline const char* buffer::data() const
-	{
-		return _M_data;
-	}
+  inline buffer& buffer::operator=(buffer&& other)
+  {
+    _M_data = other._M_data;
+    _M_size = other._M_size;
+    _M_used = other._M_used;
 
-	inline char* buffer::data()
-	{
-		return _M_data;
-	}
+    other._M_data = NULL;
+    other._M_size = 0;
+    other._M_used = 0;
 
-	inline size_t buffer::size() const
-	{
-		return _M_size;
-	}
+    return *this;
+  }
 
-	inline size_t buffer::count() const
-	{
-		return _M_used;
-	}
+  inline void buffer::swap(buffer& other)
+  {
+    char* data = _M_data;
+    _M_data = other._M_data;
+    other._M_data = data;
 
-	inline void buffer::count(size_t value)
-	{
-		_M_used = value;
-	}
+    size_t s = _M_size;
+    _M_size = other._M_size;
+    other._M_size = s;
 
-	inline void buffer::increment_count(size_t inc)
-	{
-		_M_used += inc;
-	}
+    s = _M_used;
+    _M_used = other._M_used;
+    other._M_used = s;
+  }
 
-	inline void buffer::set_initial_size(size_t initial_size)
-	{
-		if (initial_size == 0) {
-			_M_initial_size = DEFAULT_INITIAL_SIZE;
-		} else {
-			_M_initial_size = initial_size;
-		}
-	}
+  inline void buffer::free()
+  {
+    if (_M_data) {
+      ::free(_M_data);
+      _M_data = NULL;
+    }
 
-	inline bool buffer::append(char c)
-	{
-		if (!allocate(1)) {
-			return false;
-		}
+    _M_size = 0;
+    _M_used = 0;
+  }
 
-		_M_data[_M_used++] = c;
+  inline void buffer::clear()
+  {
+    _M_used = 0;
+  }
 
-		return true;
-	}
+  inline const char* buffer::data() const
+  {
+    return _M_data;
+  }
 
-	inline bool buffer::append(const char* string)
-	{
-		if (!string) {
-			return true;
-		}
+  inline char* buffer::data()
+  {
+    return _M_data;
+  }
 
-		return append(string, strlen(string));
-	}
+  inline char* buffer::end()
+  {
+    return _M_data + _M_used;
+  }
 
-	inline bool buffer::append(const char* string, size_t len)
-	{
-		if (len == 0) {
-			return true;
-		}
+  inline size_t buffer::capacity() const
+  {
+    return _M_size;
+  }
 
-		if (!allocate(len)) {
-			return false;
-		}
+  inline bool buffer::empty() const
+  {
+    return (_M_used == 0);
+  }
 
-		memcpy(_M_data + _M_used, string, len);
-		_M_used += len;
+  inline size_t buffer::length() const
+  {
+    return _M_used;
+  }
 
-		return true;
-	}
+  inline void buffer::length(size_t value)
+  {
+    _M_used = value;
+  }
 
-	inline bool buffer::append_nul_terminated_string(const char* string, size_t len)
-	{
-		if (!allocate(len + 1)) {
-			return false;
-		}
+  inline void buffer::increment_length(size_t inc)
+  {
+    _M_used += inc;
+  }
 
-		memcpy(_M_data + _M_used, string, len);
-		_M_used += len;
-		_M_data[_M_used++] = 0;
+  inline size_t buffer::remaining() const
+  {
+    return _M_size - _M_used;
+  }
 
-		return true;
-	}
+  inline bool buffer::append(char c)
+  {
+    if (!allocate(1)) {
+      return false;
+    }
 
-	inline bool buffer::format(const char* format, ...)
-	{
-		va_list ap;
-		va_start(ap, format);
+    _M_data[_M_used++] = c;
 
-		bool ret = vformat(format, ap);
+    return true;
+  }
 
-		va_end(ap);
+  inline bool buffer::append(const char* string)
+  {
+    if (!string) {
+      return true;
+    }
 
-		return ret;
-	}
+    return append(string, strlen(string));
+  }
+
+  inline bool buffer::append(const char* string, size_t len)
+  {
+    if (len == 0) {
+      return true;
+    }
+
+    if (!allocate(len)) {
+      return false;
+    }
+
+    memcpy(_M_data + _M_used, string, len);
+    _M_used += len;
+
+    return true;
+  }
+
+  inline bool buffer::append_nul_terminated_string(const char* string,
+                                                   size_t len)
+  {
+    if (!allocate(len + 1)) {
+      return false;
+    }
+
+    memcpy(_M_data + _M_used, string, len);
+    _M_used += len;
+    _M_data[_M_used++] = 0;
+
+    return true;
+  }
+
+  inline bool buffer::format(const char* format, ...)
+  {
+    va_list ap;
+    va_start(ap, format);
+
+    bool ret = vformat(format, ap);
+
+    va_end(ap);
+
+    return ret;
+  }
 }
 
-#endif // BUFFER_H
+#endif // STRING_BUFFER_H

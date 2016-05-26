@@ -100,10 +100,10 @@ namespace net {
 			_M_ssl = NULL;
 		}
 
-		if (_M_gather_output.size() > GATHER_OUTPUT_MAX_SIZE) {
+		if (_M_gather_output.capacity() > GATHER_OUTPUT_MAX_SIZE) {
 			_M_gather_output.free();
 		} else {
-			_M_gather_output.reset();
+			_M_gather_output.clear();
 		}
 	}
 

@@ -18,7 +18,7 @@ bool net::internet::http::vhost::add_index(const char* s, unsigned short n, cons
 		_M_indices.size = size;
 	}
 
-	size_t off = _M_buf.count();
+	size_t off = _M_buf.length();
 
 	if (!_M_buf.append_nul_terminated_string(s, n)) {
 		return false;

@@ -35,7 +35,7 @@ namespace net {
 #if HAVE_SSL
 	inline void filesender::reset()
 	{
-		_M_output.reset();
+		_M_output.clear();
 	}
 #endif // HAVE_SSL
 }

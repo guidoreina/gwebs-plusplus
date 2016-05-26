@@ -104,7 +104,7 @@ namespace fs {
 			bool allocate();
 	};
 
-	inline directory::directory() : _M_buf(512)
+	inline directory::directory()
 	{
 		_M_entries = NULL;
 		_M_size = 0;
@@ -124,7 +124,7 @@ namespace fs {
 
 	inline void directory::reset()
 	{
-		_M_buf.reset();
+		_M_buf.clear();
 		_M_used = 0;
 		_M_nfiles = 0;
 		_M_ndirectories = 0;

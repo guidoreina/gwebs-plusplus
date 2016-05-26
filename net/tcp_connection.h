@@ -159,7 +159,7 @@ namespace net {
 
 		tcp_connection::reset();
 
-		_M_in.reset();
+		_M_in.clear();
 		_M_inp = 0;
 
 		delete_timer();

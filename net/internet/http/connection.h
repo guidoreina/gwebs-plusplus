@@ -177,16 +177,16 @@ namespace net {
 				_M_ranges.reset();
 				_M_nrange = 0;
 
-				if (_M_path.size() > 32) {
+				if (_M_path.capacity() > 32) {
 					_M_path.free();
 				} else {
-					_M_path.reset();
+					_M_path.clear();
 				}
 
-				if (_M_body.size() > 2 * 1024) {
+				if (_M_body.capacity() > 2 * 1024) {
 					_M_body.free();
 				} else {
-					_M_body.reset();
+					_M_body.clear();
 				}
 
 				if (_M_file.fd() != -1) {

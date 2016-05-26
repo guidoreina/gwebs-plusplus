@@ -53,7 +53,7 @@ namespace net {
 					bool search(const char* extension, unsigned short extensionlen, size_t& pos) const;
 			};
 
-			inline types::types() : _M_buf(16 * 1024)
+			inline types::types()
 			{
 				_M_extensions = NULL;
 				_M_size = 0;

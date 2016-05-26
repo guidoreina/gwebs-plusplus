@@ -93,7 +93,7 @@ bool fs::file::read_all(const char* pathname, string::buffer& buf, off_t max)
 		return false;
 	}
 
-	char* end = buf.data() + buf.count();
+	char* end = buf.end();
 	off_t size = status.st_size;
 
 	do {
@@ -111,7 +111,7 @@ bool fs::file::read_all(const char* pathname, string::buffer& buf, off_t max)
 
 	f.close();
 
-	buf.increment_count(status.st_size - size);
+	buf.increment_length(status.st_size - size);
 
 	return true;
 }

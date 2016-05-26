@@ -17,7 +17,7 @@ net::internet::url::url() : _M_scheme(scheme::UNKNOWN)
 
 void net::internet::url::reset()
 {
-	_M_buf.reset();
+	_M_buf.clear();
 
 	_M_scheme.value = scheme::UNKNOWN;
 
@@ -456,7 +456,7 @@ net::internet::url::parse_result net::internet::url::parse(const void* buf, size
 
 	if (_M_userinfolen > 0) {
 		// Save userinfo.
-		size_t count = _M_buf.count();
+		size_t count = _M_buf.length();
 
 		if (!_M_buf.append_nul_terminated_string(reinterpret_cast<const char*>(begin) + _M_userinfo, _M_userinfolen)) {
 			return kNoMemory;
@@ -467,7 +467,7 @@ net::internet::url::parse_result net::internet::url::parse(const void* buf, size
 
 	if (_M_hostlen > 0) {
 		// Save host.
-		size_t count = _M_buf.count();
+		size_t count = _M_buf.length();
 
 		if (!_M_buf.append_nul_terminated_string(reinterpret_cast<const char*>(begin) + _M_host, _M_hostlen)) {
 			return kNoMemory;
@@ -478,7 +478,7 @@ net::internet::url::parse_result net::internet::url::parse(const void* buf, size
 
 	if (_M_pathlen > 0) {
 		// Save path.
-		size_t count = _M_buf.count();
+		size_t count = _M_buf.length();
 
 		if (!_M_buf.append_nul_terminated_string(reinterpret_cast<const char*>(begin) + _M_path, _M_pathlen)) {
 			return kNoMemory;
@@ -489,7 +489,7 @@ net::internet::url::parse_result net::internet::url::parse(const void* buf, size
 
 	if (_M_querylen > 0) {
 		// Save query.
-		size_t count = _M_buf.count();
+		size_t count = _M_buf.length();
 
 		if (!_M_buf.append_nul_terminated_string(reinterpret_cast<const char*>(begin) + _M_query, _M_querylen)) {
 			return kNoMemory;
@@ -500,7 +500,7 @@ net::internet::url::parse_result net::internet::url::parse(const void* buf, size
 
 	if (_M_fragmentlen > 0) {
 		// Save fragment.
-		size_t count = _M_buf.count();
+		size_t count = _M_buf.length();
 
 		if (!_M_buf.append_nul_terminated_string(reinterpret_cast<const char*>(begin) + _M_fragment, _M_fragmentlen)) {
 			return kNoMemory;
@@ -520,7 +520,7 @@ bool net::internet::url::encode(const char* url, size_t len, string::buffer& buf
 
 	const char* end = url + len;
 
-	char* d = buf.data() + buf.count();
+	char* d = buf.end();
 	char* dest = d;
 
 	while (url < end) {
@@ -546,7 +546,7 @@ bool net::internet::url::encode(const char* url, size_t len, string::buffer& buf
 		}
 	}
 
-	buf.increment_count(dest - d);
+	buf.increment_length(dest - d);
 
 	return true;
 }

@@ -87,7 +87,7 @@ namespace net {
 					vhost* _M_parent;
 			};
 
-			inline vhost::vhost(vhost* parent) : _M_buf(512)
+			inline vhost::vhost(vhost* parent)
 			{
 				_M_namelen = 0;
 				_M_port = 0;
@@ -127,7 +127,7 @@ namespace net {
 
 			inline bool vhost::name(const char* s, unsigned short n)
 			{
-				size_t off = _M_buf.count();
+				size_t off = _M_buf.length();
 
 				if (!_M_buf.append_nul_terminated_string(s, n)) {
 					return false;
@@ -165,7 +165,7 @@ namespace net {
 					return false;
 				}
 
-				size_t off = _M_buf.count();
+				size_t off = _M_buf.length();
 
 				if (!_M_buf.append_nul_terminated_string(s, n)) {
 					return false;

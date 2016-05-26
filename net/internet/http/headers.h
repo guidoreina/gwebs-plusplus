@@ -329,7 +329,7 @@ namespace net {
 				return ((c == '\t') || (!is_control(c)));
 			}
 
-			inline headers::headers(bool ignore_errors) : _M_buf(512)
+			inline headers::headers(bool ignore_errors)
 			{
 				_M_headers = NULL;
 				_M_size = 0;
@@ -363,7 +363,7 @@ namespace net {
 			inline void headers::reset()
 			{
 				_M_used = 0;
-				_M_buf.reset();
+				_M_buf.clear();
 
 				_M_state.reset();
 			}

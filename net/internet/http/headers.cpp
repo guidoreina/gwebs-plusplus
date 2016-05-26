@@ -315,7 +315,7 @@ bool net::internet::http::headers::add(const header_name& name, const header_val
 	}
 
 	char* data = _M_buf.data();
-	size_t count = _M_buf.count();
+	size_t count = _M_buf.length();
 
 	int len;
 	if ((len = clean(value, data + count)) < 0) {
@@ -348,7 +348,7 @@ bool net::internet::http::headers::add(const header_name& name, const header_val
 		data[count++] = 0;
 	}
 
-	_M_buf.count(count);
+	_M_buf.length(count);
 
 	_M_used++;
 

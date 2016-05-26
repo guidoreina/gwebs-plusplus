@@ -29,7 +29,7 @@ bool net::internet::http::dirlisting::build(const char* dir, unsigned short dirl
 		return false;
 	}
 
-	size_t offset = buf.count();
+	size_t offset = buf.length();
 
 	size_t count;
 	if (!html::encode(dir, dirlen, dirlen, buf, count)) {
@@ -44,8 +44,8 @@ bool net::internet::http::dirlisting::build(const char* dir, unsigned short dirl
 		return false;
 	}
 
-	memcpy(buf.data() + buf.count(), buf.data() + offset, count);
-	buf.increment_count(count);
+	memcpy(buf.end(), buf.data() + offset, count);
+	buf.increment_length(count);
 
 	if (!buf.append(THIRD, sizeof(THIRD) - 1)) {
 		return false;
@@ -202,8 +202,8 @@ bool net::internet::http::dirlisting::build(const char* dir, unsigned short dirl
 		return false;
 	}
 
-	if (_M_footer.count() > 0) {
-		if (!buf.append(_M_footer.data(), _M_footer.count())) {
+	if (!_M_footer.empty()) {
+		if (!buf.append(_M_footer.data(), _M_footer.length())) {
 			return false;
 		}
 	}

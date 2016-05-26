@@ -320,7 +320,7 @@ ssize_t net::ssl_socket::write(const void* buf, size_t count, int timeout)
 
 ssize_t net::ssl_socket::writev(const struct iovec* iov, unsigned iovcnt, bool& want_read, bool& want_write)
 {
-	if (_M_gather_output.count() == 0) {
+	if (_M_gather_output.empty()) {
 		// Too many buffers?
 		if (iovcnt > IOV_MAX) {
 			want_read = false;
@@ -342,10 +342,10 @@ ssize_t net::ssl_socket::writev(const struct iovec* iov, unsigned iovcnt, bool& 
 	}
 
 	ssize_t ret;
-	if ((ret = write(_M_gather_output.data(), _M_gather_output.count(), want_read, want_write)) < 0) {
+	if ((ret = write(_M_gather_output.data(), _M_gather_output.length(), want_read, want_write)) < 0) {
 		return -1;
 	} else {
-		_M_gather_output.reset();
+		_M_gather_output.clear();
 
 		return ret;
 	}
@@ -353,7 +353,7 @@ ssize_t net::ssl_socket::writev(const struct iovec* iov, unsigned iovcnt, bool& 
 
 ssize_t net::ssl_socket::writev(const struct iovec* iov, unsigned iovcnt, int timeout)
 {
-	if (_M_gather_output.count() == 0) {
+	if (_M_gather_output.empty()) {
 		// Too many buffers?
 		if (iovcnt > IOV_MAX) {
 			return -1;
@@ -369,10 +369,10 @@ ssize_t net::ssl_socket::writev(const struct iovec* iov, unsigned iovcnt, int ti
 	}
 
 	ssize_t ret;
-	if ((ret = write(_M_gather_output.data(), _M_gather_output.count(), timeout)) < 0) {
+	if ((ret = write(_M_gather_output.data(), _M_gather_output.length(), timeout)) < 0) {
 		return -1;
 	} else {
-		_M_gather_output.reset();
+		_M_gather_output.clear();
 
 		return ret;
 	}

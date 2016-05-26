@@ -124,7 +124,7 @@ bool fs::directory::add(entry_type type, const char* name, unsigned short namele
 		}
 	}
 
-	size_t offset = _M_buf.count();
+	size_t offset = _M_buf.length();
 
 	if (!_M_buf.append(name, namelen + 1)) {
 		return false;
