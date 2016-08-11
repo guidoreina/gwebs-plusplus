@@ -11,7 +11,7 @@ namespace net {
 	class tcp_server;
 
 #if _LP64
-	struct listener __final : protected socket, public io::event_handler {
+	struct listener final : protected socket, public io::event_handler {
 #else
 	struct listener : protected socket, public io::event_handler {
 #endif
