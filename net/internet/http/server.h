@@ -18,10 +18,11 @@ namespace net {
 					server();
 
 					// Destructor.
-					virtual ~server();
+					~server();
 
 					// Create.
-					virtual bool create(const char* config_file, const char* mime_types_file);
+					using tcp_server::create;
+					bool create(const char* config_file, const char* mime_types_file);
 
 					// On new connection.
 					bool on_new_connection(socket& client, const socket_address& addr, struct listener* listener);

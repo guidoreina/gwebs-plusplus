@@ -440,13 +440,13 @@ namespace util {
 	}
 
 	template<typename T>
-	inline struct red_black_tree<T>::node* red_black_tree<T>::search(const T& data)
+	inline typename red_black_tree<T>::node* red_black_tree<T>::search(const T& data)
 	{
-		return const_cast<struct red_black_tree<T>::node*>(const_cast<const struct red_black_tree<T>&>(*this).search(data));
+		return const_cast<red_black_tree<T>::node*>(const_cast<const red_black_tree<T>&>(*this).search(data));
 	}
 
 	template<typename T>
-	const struct red_black_tree<T>::node* red_black_tree<T>::search(const T& data) const
+	const typename red_black_tree<T>::node* red_black_tree<T>::search(const T& data) const
 	{
 		const node* node = _M_root;
 		while (node != _nil) {
@@ -644,13 +644,13 @@ namespace util {
 	}
 
 	template<typename T>
-	inline struct red_black_tree<T>::node* red_black_tree<T>::minimum(node* x)
+	inline typename red_black_tree<T>::node* red_black_tree<T>::minimum(node* x)
 	{
-		return const_cast<struct red_black_tree<T>::node*>(const_cast<const struct red_black_tree<T>&>(*this).minimum(x));
+		return const_cast<red_black_tree<T>::node*>(const_cast<const red_black_tree<T>&>(*this).minimum(x));
 	}
 
 	template<typename T>
-	inline const struct red_black_tree<T>::node* red_black_tree<T>::minimum(const node* x) const
+	inline const typename red_black_tree<T>::node* red_black_tree<T>::minimum(const node* x) const
 	{
 		while (x->left != _nil) {
 			x = x->left;
@@ -660,13 +660,13 @@ namespace util {
 	}
 
 	template<typename T>
-	inline struct red_black_tree<T>::node* red_black_tree<T>::maximum(node* x)
+	inline typename red_black_tree<T>::node* red_black_tree<T>::maximum(node* x)
 	{
-		return const_cast<struct red_black_tree<T>::node*>(const_cast<const struct red_black_tree<T>&>(*this).maximum(x));
+		return const_cast<red_black_tree<T>::node*>(const_cast<const red_black_tree<T>&>(*this).maximum(x));
 	}
 
 	template<typename T>
-	inline const struct red_black_tree<T>::node* red_black_tree<T>::maximum(const node* x) const
+	inline const typename red_black_tree<T>::node* red_black_tree<T>::maximum(const node* x) const
 	{
 		while (x->right != _nil) {
 			x = x->right;
@@ -676,13 +676,13 @@ namespace util {
 	}
 
 	template<typename T>
-	struct red_black_tree<T>::node* red_black_tree<T>::successor(node* x)
+	typename red_black_tree<T>::node* red_black_tree<T>::successor(node* x)
 	{
-		return const_cast<struct red_black_tree<T>::node*>(const_cast<const struct red_black_tree<T>&>(*this).successor(x));
+		return const_cast<red_black_tree<T>::node*>(const_cast<const red_black_tree<T>&>(*this).successor(x));
 	}
 
 	template<typename T>
-	const struct red_black_tree<T>::node* red_black_tree<T>::successor(const node* x) const
+	const typename red_black_tree<T>::node* red_black_tree<T>::successor(const node* x) const
 	{
 		if (x->right != _nil) {
 			return minimum(x->right);
@@ -698,13 +698,13 @@ namespace util {
 	}
 
 	template<typename T>
-	struct red_black_tree<T>::node* red_black_tree<T>::predecessor(node* x)
+	typename red_black_tree<T>::node* red_black_tree<T>::predecessor(node* x)
 	{
-		return const_cast<struct red_black_tree<T>::node*>(const_cast<const struct red_black_tree<T>&>(*this).predecessor(x));
+		return const_cast<red_black_tree<T>::node*>(const_cast<const red_black_tree<T>&>(*this).predecessor(x));
 	}
 
 	template<typename T>
-	const struct red_black_tree<T>::node* red_black_tree<T>::predecessor(const node* x) const
+	const typename red_black_tree<T>::node* red_black_tree<T>::predecessor(const node* x) const
 	{
 		if (x->left != _nil) {
 			return maximum(x->left);

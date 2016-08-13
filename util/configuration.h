@@ -107,10 +107,10 @@ namespace util {
 			bool get_key(const char*& key, unsigned short& keylen, size_t i, ...) const;
 
 			// Get value.
-			bool get_value(const char*& value, unsigned short& valuelen, ...) const;
+			bool get_value(const char*& value, unsigned short* valuelen, ...) const;
 
 			// Get children count.
-			bool get_children_count(size_t& count, ...) const;
+			bool get_children_count(size_t* count, ...) const;
 
 			// Begin.
 			bool begin(iterator& it) const;

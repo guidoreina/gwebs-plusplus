@@ -44,7 +44,7 @@ bool net::internet::http::server::load_config(const char* config_file)
 
 	const char* value;
 	unsigned short valuelen;
-	if (!conf.get_value(value, valuelen, "http", "directory_listing", NULL)) {
+	if (!conf.get_value(value, &valuelen, "http", "directory_listing", NULL)) {
 		global_directory_listing = TRIBOOL_UNDEFINED;
 	} else {
 		if (valuelen == 3) {
@@ -92,7 +92,7 @@ bool net::internet::http::server::load_config(const char* config_file)
 
 		const char* root;
 		unsigned short rootlen;
-		if (!conf.get_value(root, rootlen, "http", "hosts", host, "root", NULL)) {
+		if (!conf.get_value(root, &rootlen, "http", "hosts", host, "root", NULL)) {
 			fprintf(stderr, "Host \"%s\" doesn't have root.\n", host);
 			return false;
 		}
@@ -105,7 +105,7 @@ bool net::internet::http::server::load_config(const char* config_file)
 		}
 
 		bool default_vhost;
-		if (!conf.get_value(value, valuelen, "http", "hosts", host, "default", NULL)) {
+		if (!conf.get_value(value, &valuelen, "http", "hosts", host, "default", NULL)) {
 			default_vhost = false;
 		} else {
 			if (valuelen == 3) {
@@ -132,7 +132,7 @@ bool net::internet::http::server::load_config(const char* config_file)
 		if (global_directory_listing == TRIBOOL_FALSE) {
 			directory_listing = false;
 		} else {
-			if (!conf.get_value(value, valuelen, "http", "hosts", host, "directory_listing", NULL)) {
+			if (!conf.get_value(value, &valuelen, "http", "hosts", host, "directory_listing", NULL)) {
 				directory_listing = (global_directory_listing == TRIBOOL_TRUE) ? true : false;
 			} else {
 				if (valuelen == 3) {
@@ -256,7 +256,7 @@ bool net::internet::http::server::load_config(const char* config_file)
 				return false;
 			}
 
-			if (!conf.get_value(value, valuelen, "http", "hosts", host, "listen", listener, NULL)) {
+			if (!conf.get_value(value, &valuelen, "http", "hosts", host, "listen", listener, NULL)) {
 				fprintf(stderr, "Value for listener \"%s\" is missing.\n", listener);
 				return false;
 			}

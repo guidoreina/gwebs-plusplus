@@ -596,7 +596,7 @@ bool util::configuration::get_key(const char*& key, unsigned short& keylen, size
 	return true;
 }
 
-bool util::configuration::get_value(const char*& value, unsigned short& valuelen, ...) const
+bool util::configuration::get_value(const char*& value, unsigned short* valuelen, ...) const
 {
 	va_list ap;
 	va_start(ap, valuelen);
@@ -610,12 +610,12 @@ bool util::configuration::get_value(const char*& value, unsigned short& valuelen
 	}
 
 	value = k->_M_value.data;
-	valuelen = k->_M_value.len;
+	*valuelen = k->_M_value.len;
 
 	return true;
 }
 
-bool util::configuration::get_children_count(size_t& count, ...) const
+bool util::configuration::get_children_count(size_t* count, ...) const
 {
 	va_list ap;
 	va_start(ap, count);
@@ -630,7 +630,7 @@ bool util::configuration::get_children_count(size_t& count, ...) const
 			return false;
 		}
 
-		count = _M_keys.used;
+		*count = _M_keys.used;
 		return true;
 	}
 
@@ -638,7 +638,7 @@ bool util::configuration::get_children_count(size_t& count, ...) const
 		return false;
 	}
 
-	count = (k->_M_children) ? k->_M_children->used : 0;
+	*count = (k->_M_children) ? k->_M_children->used : 0;
 
 	return true;
 }
