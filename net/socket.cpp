@@ -48,7 +48,7 @@ bool net::socket::connect(type type, const socket_address& addr, int timeout)
 	}
 
 	// Connect.
-	if ((::connect(_M_fd, reinterpret_cast<const struct sockaddr*>(&addr), sizeof(socket_address)) < 0) && (errno != EINPROGRESS)) {
+	if ((::connect(_M_fd, reinterpret_cast<const struct sockaddr*>(&addr), addr.size()) < 0) && (errno != EINPROGRESS)) {
 		close();
 		return false;
 	}
